@@ -5,12 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
-// stactic tools , nothing important
-
 public class tool {
 	
-	
-	//open picture , return an array
 	static public int[][][] open_picture(String picture_name,boolean rgb) {	
 		BufferedImage image = null;
 		try{
@@ -33,7 +29,6 @@ public class tool {
 		return image_array;
 	}
 	
-	// transfer to gray picture , not use in the end
 	static public double[][] transfer_to_gray_picture(int[][][] color_picture){
 		if(color_picture==null)return null;
 		double[][] gray_picture = new double[color_picture.length][color_picture[0].length];
@@ -44,7 +39,6 @@ public class tool {
 		return gray_picture;
 	}
 	
-	// transfer rgb to hsv
 	static public double[] rgb_hsv_converter(int[] rgb){
 		double  r= (double) rgb[0]/256;
 		double  g= (double) rgb[1]/256;
@@ -64,7 +58,6 @@ public class tool {
 	    return hsv;
 	}
 	
-	// quere for pic frames
 	static public void queue_add(int[][][][] pic_frame,int[][][] new_pic){
 		for(int i=1;i<pic_frame.length;i++){
 			pic_frame[i-1] = pic_frame[i];
@@ -72,7 +65,6 @@ public class tool {
 		pic_frame[pic_frame.length-1] = new_pic;
 	}
 	
-	// split the picture
 	static public int[][][][][] split(int[][][] picture,int x ,int y){
 		int[][][][][] split_picture = new int[x][y][picture.length/x][picture[0].length/y][];
 		for(int i=0;i<picture.length;i++){
@@ -83,7 +75,7 @@ public class tool {
 		}}
 		return split_picture;
 	}
-	//class for a frame
+
 	static public class frame{
 		List<Integer> frame_scores = new ArrayList<Integer>();
 		String frame_name = "";
@@ -94,7 +86,7 @@ public class tool {
 		int pic_w;
 		int pic_type = 5;
 	}
-	//calculate standard deviation
+
 	static public double[] standard_deviation(List<frame> data){
 		double[] m = new double[data.get(0).frame_scores.size()];
 		for(frame fns:data){
@@ -114,7 +106,7 @@ public class tool {
 		}
 		return ad;
 	}
-	//calculate median
+
 	static public double[] median (List<frame> data){
 		double[] m = new double[data.get(0).frame_scores.size()];
 		for(frame fns:data){

@@ -1,8 +1,5 @@
-//the histogram class , which is a histogram
-
 public class histogram {
 	
-	//paremeter
 	static int bin_range = 8;
 	static int gray_bin_range = 8;
 	static int h_bin_range = 3;
@@ -11,7 +8,6 @@ public class histogram {
 	double[] gray_bin = null;
 	double[][][] hsv_bin = null;	
 	
-	// build the histogram once the class build
 	public histogram(int[][][] picure){	
 		rgb_bin = new int[256/bin_range][256/bin_range][256/bin_range];
 		gray_bin = new double[256/gray_bin_range];
@@ -25,7 +21,6 @@ public class histogram {
 		}}
 	}
 	
-	//caculate rgb differ
 	static public int histogram_rgb_differ_calculate(histogram[] histograms){
 		int differ = 0;
 		for(int dd=1;dd<histograms.length;dd++){
@@ -37,7 +32,7 @@ public class histogram {
 		}
 		return differ;
 	}
-	//caculate gray differ
+
 	static public int histogram_gray_differ_calculate(histogram[] histograms){
 		int differ = 0;
 		for(int dd=1;dd<histograms.length;dd++){
@@ -47,7 +42,7 @@ public class histogram {
 		}	
 		return differ;
 	}
-	//caculate hsv differ
+
 	static public int histogram_h_differ_calculate(histogram[] histograms){
 		int differ = 0;
 		for(int dd=1;dd<histograms.length;dd++){

@@ -8,32 +8,26 @@ import javax.imageio.ImageIO;
 
 public class shot_detection_summarization {
 	
-	//do shot detection summarization
 	public shot_detection_summarization(String path) {
 			
-		//list of frame object , to store all the imformation of a frame
 		List<tool.frame> frames_names_scores = new ArrayList<tool.frame>();
 		
-		//do shot boundary detection
 		shot_detection(path,frames_names_scores);
 		
-		//do shot summarization , find key frame and generate a layout picture
 		shot_summarization(path,frames_names_scores);
 		
-		//print the result to standard output
 		for (tool.frame current_frame_name_score : frames_names_scores){
 			if(current_frame_name_score.shot_change == true)System.out.println("shot change detected:"+current_frame_name_score.frame_name);
 			if(current_frame_name_score.key_frame == true)System.out.println("key frame detected:"+current_frame_name_score.frame_name);
 		}
 	}
 	
-	// shot detection
 	public void shot_detection(String path,List<tool.frame> frames_names_scores){
 		File dir = new File(path);
 		File[] filelist= dir.listFiles();
 		int[][][] current_pic = null;
 		String current_pic_name = null;
-		int[][][][] shot_detected_frame = new int[2][][][]; //how many frames to caculate the differ
+		int[][][][] shot_detected_frame = new int[2][][][];
 		
 		for(int i=0;i<filelist.length;i++){
 			current_pic = tool.open_picture(path+Integer.toString(i+1)+".jpg",true);
@@ -46,19 +40,18 @@ public class shot_detection_summarization {
 		    current_frame_name_score.pic_type = 5;//set to jpg
 		    
 		    current_frame_name_score.frame_name=current_pic_name;
-		    //start to calculate the difference by algorithms
+
 		    int shot_change_detection_down = shot_change_scoring(shot_detected_frame,current_frame_name_score);
 		    if (shot_change_detection_down == 0){
-		    	//after difference calculated , store this frame into the frame list , waiting for use
+
 		    	frames_names_scores.add(current_frame_name_score);
 		    }	
-		    //print some message to let user know it still running
+
 		    if(i%50==0){
 		    	System.out.println("");
 		    }else System.out.print("-");
 		}System.out.println("");
 		
-		//calculate tresholds
 		double[] ad = tool.standard_deviation(frames_names_scores);
 		double[] mm = tool.median(frames_names_scores);
 		for (tool.frame current_frame_name_score : frames_names_scores){
@@ -66,7 +59,7 @@ public class shot_detection_summarization {
 				current_frame_name_score.shot_change = true;
 			}
 		}	
-		//remove shots that is too short
+
 		for (int i=0;i<frames_names_scores.size();i++){
 			if(frames_names_scores.get(i).shot_change == true){
 				int k=0;
@@ -91,18 +84,16 @@ public class shot_detection_summarization {
 		}}}
 	}
 	
-	//calculate the score of a frame by the difference with its neighbor frames 
 	public int shot_change_scoring(int[][][][] shot_detected_frame,tool.frame current_frame_name_score){
 		for(int i=0;i<shot_detected_frame.length;i++){
 			if(shot_detected_frame[i]==null)return -1;	
 		}
-		// use histogram algorithm
+
 		histogram_algo(shot_detected_frame,current_frame_name_score);
 		
 		return 0;
 	}
 	
-	//histogram algorithm
 	public void histogram_algo(int[][][][] shot_detected_frame,tool.frame current_frame_name_score){
 		int split_x = 4;
 		int split_y = 4;
@@ -112,7 +103,6 @@ public class shot_detection_summarization {
 		
 		histogram[][] histograms = new histogram[split_x*split_y][shot_detected_frame.length];
 		
-		//build histogram
 		for(int i=0;i<shot_detected_frame.length;i++){
 			int[][][][][] split_shot_detected_frame = tool.split(shot_detected_frame[i], split_x, split_y );
 			for(int sx=0;sx<split_x;sx++){
@@ -120,14 +110,14 @@ public class shot_detection_summarization {
 					histograms[sx*sy][i] = new histogram(split_shot_detected_frame[sx][sy]);
 			}}	
 		}
-		//calculate histogram L1 distance
+
 		for(int sx=0;sx<split_x;sx++){
 			for(int sy=0;sy<split_y;sy++){	
 				differ_gray += histogram.histogram_gray_differ_calculate(histograms[sx*sy]);
 				differ_color += histogram.histogram_rgb_differ_calculate(histograms[sx*sy]);
 				differ_h += histogram.histogram_h_differ_calculate(histograms[sx*sy]);
 		}}
-		// store the result back
+
 		current_frame_name_score.frame_scores.add(differ_color);
 		current_frame_name_score.frame_scores.add(differ_gray);
 		current_frame_name_score.frame_scores.add(differ_h);
@@ -135,16 +125,12 @@ public class shot_detection_summarization {
 		return;
 	}
 	
-	
-	//do shot summarization
 	public void shot_summarization(String path,List<tool.frame> frames_names_scores){
-		//extact key frame
+
 		key_frame_extraction(frames_names_scores);
-		//build layout
 		make_summarization_layout(path,frames_names_scores);
 	}
 	
-	//build layout
 	public void make_summarization_layout(String path,List<tool.frame> frames_names_scores){
 		int max_length = -1;
 		int min_length = 999999;
@@ -222,7 +208,6 @@ public class shot_detection_summarization {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	
-	// extract key frame
 	public void key_frame_extraction(List<tool.frame> frames_names_scores){
 		int tmp_key_frame_index = 0;
 		int min_differ = 9999999;
@@ -237,9 +222,9 @@ public class shot_detection_summarization {
 		frames_names_scores.get(tmp_key_frame_index).key_frame=true;min_differ = 9999999;tmp_key_frame_index = 0;
 	}
 	
-	//main
 	public static void main(String[] args){
+
 		shot_detection_summarization sds = new shot_detection_summarization(args[0]);
-		//shot_detection_summarization sds = new shot_detection_summarization("../videos.hw01/01_frame/");
+
 	}
 }
